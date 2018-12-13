@@ -1,26 +1,17 @@
 import { eventChannel } from 'redux-saga';
-import {
-  take,
-  call,
-  getContext,
-  setContext,
-  all,
-  fork,
-} from 'redux-saga/effects';
+import { take, call, put, fork } from 'redux-saga/effects';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+
+import { receiveWebsocketMessage } from './actions';
 
 const createWebsocketChannel = ws =>
   eventChannel(emitter => {
-    ws.onmessage = message => {
-      emitter(JSON.parse(message.data));
-    };
+    ws.addEventListener('message', message => {
+      emitter(receiveWebsocketMessage(message.data));
+    });
 
     return () => ws.close();
   });
-
-export function configureWebsockets() {
-  return setContext({ wsHandlers: new Set() });
-}
 
 function* websocketMessageSender(ws) {
   while (true) {
@@ -35,13 +26,7 @@ export function* websocketManager({ url }) {
   yield fork(websocketMessageSender, ws);
 
   while (true) {
-    const message = yield take(wsChannel);
-    const subscriptions = yield getContext('wsHandlers');
-    yield all(Array.from(subscriptions).map(s => call(s, message)));
+    const action = yield take(wsChannel);
+    yield put(action);
   }
-}
-
-export function* addMessageHandler(handler) {
-  const subscriptions = yield getContext('wsHandlers');
-  subscriptions.add(handler);
 }

@@ -1,5 +1,2 @@
-export {
-  configureWebsockets,
-  websocketManager,
-  addMessageHandler,
-} from './sagas';
+export { WEBSOCKET_MESSAGE_RECEIVED } from './constants';
+export { websocketManager } from './sagas';
