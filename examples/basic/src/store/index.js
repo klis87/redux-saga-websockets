@@ -4,6 +4,8 @@ import { put, fork, all, takeEvery } from 'redux-saga/effects';
 import {
   websocketManager,
   WEBSOCKET_MESSAGE_RECEIVED,
+  WEBSOCKET_STATE,
+  websocketReducer,
 } from 'redux-saga-websockets';
 
 import { messagesReducer } from './reducers';
@@ -27,6 +29,7 @@ function* rootSaga() {
 export const configureStore = () => {
   const reducers = combineReducers({
     messages: messagesReducer,
+    [WEBSOCKET_STATE]: websocketReducer,
   });
 
   const sagaMiddleware = createSagaMiddleware();

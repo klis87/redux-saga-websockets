@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { isWebsocketDisconnected } from 'redux-saga-websockets';
 
 import { sendMessage } from '../store/actions';
 
 // You should use selectors here in your real projects, here we don't for simplicity
 const mapStateToProps = state => ({
   messages: state.messages,
+  websocketDisconnected: isWebsocketDisconnected(state),
 });
 
 const mapDispatchToProps = {
@@ -19,11 +21,23 @@ class App extends Component {
   };
 
   render() {
-    const { messages, sendMessage } = this.props;
+    const { messages, sendMessage, websocketDisconnected } = this.props;
 
     return (
       <div>
         <h1>Redux Saga Websockets basic example</h1>
+        {websocketDisconnected && (
+          <div
+            style={{
+              padding: 10,
+              backgroundColor: 'red',
+              color: 'white',
+              marginBottom: 10,
+            }}
+          >
+            Connection lost
+          </div>
+        )}
         <input
           type="text"
           value={this.state.title}
